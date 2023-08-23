@@ -1,9 +1,11 @@
-﻿namespace Infrastructure.Models;
+﻿using Infrastructure.Data.Models.Base;
 
-public class Book
+namespace Infrastructure.Data.Models;
+
+public class Book : BaseEntity
 {
     public string Name { get; set; }
-    
+
     public int GenerId { get; set; }
     public int ISBN { get; set; }
     public decimal Price { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Models;
+﻿namespace Infrastructure.Data.Models.Base;
 
 public class BaseEntity
 {
