@@ -1,6 +1,10 @@
 ﻿using Infrastructure.Data.Models;
+using Infrastructure.Data.Models.Base;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Security.Principal;
 
 namespace Infrastructure.Data;
 
@@ -16,6 +20,9 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        var entitiesAssembly = typeof(IEntity).Assembly;
+
+        builder.RegisterAllEntities<IEntity>(entitiesAssembly);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

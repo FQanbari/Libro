@@ -3,6 +3,8 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Infrastructure.Data;
+using Domain.Entities;
+using Infrastructure.Repository;
 
 namespace Infrastructure.Extensions;
 
@@ -12,7 +14,7 @@ public static class IServiceCollectionExtensions
     {
         //services.AddMappings();
         services.AddDbContext(configuration);
-        //services.AddRepositories();
+        services.AddRepositories();
 
     }
 
@@ -29,5 +31,8 @@ public static class IServiceCollectionExtensions
                builder => builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
     }
 
-
+    private static void AddRepositories(this IServiceCollection services)
+    {
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+    }
 }

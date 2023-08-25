@@ -1,27 +1,34 @@
-﻿using Application.Interface;
-using Infrastructure.Repository;
+﻿using Application.Interfaces;
+using Domain.Entities;
+using Infrastructure.Data.Models.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Service;
 
-public class Service<T> : IService<T> where T : class
+public class Service<TEntity> : IService<TEntity> where TEntity : class
 {
-    private readonly Repository<T> _repository;
-    public Service(Repository<T> repository)
+    private readonly IRepository<TEntity> _repository;
+    public Service(IRepository<TEntity> repository)
     {
         _repository = repository;
     }
-    public async Task AddOrUpdate(T model)
+    public async Task AddOrUpdate(Object entity, CancellationToken cancellationToken)
     {
-        await _repository.AddOrUpdate(model);
+        await _repository.AddOrUpdate(entity as TEntity, cancellationToken);
     }
 
-    public async Task<T> Get()
+    public async Task<TEntity> FindById(CancellationToken cancellationToken, params object[] ids)
     {
-        return await _repository.Get();
+        return await _repository.FindById(cancellationToken, ids);
     }
 
-    public async Task Remove(T model)
+    public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancellationToken)
     {
-        await _repository.Remove(model);
+        return await _repository.TableNoTracking.ToListAsync();
+    }
+
+    public async Task Remove(TEntity entity, CancellationToken cancellationToken)
+    {
+        await _repository.Remove(entity, cancellationToken);
     }
 }

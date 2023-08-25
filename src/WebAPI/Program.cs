@@ -1,12 +1,19 @@
 using Infrastructure.Data;
 using Infrastructure.Extensions;
 using Application.Extensions;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.EnableAnnotations();
+});
 builder.Services.AddApplicationLayer();
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 
@@ -38,6 +45,16 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<WebAPI.Middleware.ExceptionMiddleware>();
 
 app.UseAuthorization();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+// specifying the Swagger JSON endpoint.
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 
 app.MapControllers();
 

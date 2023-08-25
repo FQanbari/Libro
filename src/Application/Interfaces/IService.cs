@@ -1,8 +1,9 @@
 ﻿namespace Application.Interfaces;
 
-public interface IService<T> where T : class
+public interface IService<TEntity> where TEntity : class
 {
-    Task<T> Get();
-    Task AddOrUpdate(T model);
-    Task Remove(T model);
+    Task<TEntity> FindById(CancellationToken cancellationToken, params object[] ids);
+    Task<IEnumerable<TEntity>> GetAll(CancellationToken cancellationToken);
+    Task AddOrUpdate(object entity, CancellationToken cancellationToken);
+    Task Remove(TEntity entity, CancellationToken cancellationToken);
 }

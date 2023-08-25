@@ -1,22 +1,38 @@
-﻿using Domain.Entities.BookAggregate;
+﻿using Domain.Entities;
+using Infrastructure.Data;
+using Infrastructure.Data.Models.Base;
+using Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
-public class Repository<T> : IRepository<T> where T : class
+public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
+    private readonly ApplicationDbContext _dbContext;
+    public DbSet<TEntity> Entities { get; }
+    public IQueryable<TEntity> Table => Entities;
+    public IQueryable<TEntity> TableNoTracking => Entities.AsNoTracking();
 
-    public Task AddOrUpdate(T model)
+    public Repository(ApplicationDbContext dbContext)
     {
-        throw new NotImplementedException();
+        this._dbContext = dbContext;
+        Entities = _dbContext.Set<TEntity>();
+    }
+    public async Task AddOrUpdate(TEntity entity, CancellationToken cancellationToken)
+    {
+        Assert.NotNull(entity, nameof(entity));
+        await Entities.AddAsync(entity, cancellationToken).ConfigureAwait(false);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public Task<T> Get()
+    public async Task Remove(TEntity entity, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        Assert.NotNull(entity, nameof(entity));
+        Entities.Remove(entity);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
-
-    public Task Remove(T model)
+    public async Task<TEntity> FindById(CancellationToken cancellationToken, params object[] ids)
     {
-        throw new NotImplementedException();
+        return await Entities.FindAsync(ids, cancellationToken).ConfigureAwait(false);
     }
 }

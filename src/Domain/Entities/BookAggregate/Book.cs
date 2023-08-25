@@ -2,7 +2,7 @@
 
 public class Book
 {
-    public Book(string name, List<Author> authors, int generId, DateTime publishDate, int isbn, decimal price)
+    public Book(string name, List<Author> authors, int generId, DateTime publishDate, int isbn, decimal price, int? id = null)
     {
         Name = name;
         _authors = authors;
@@ -10,7 +10,9 @@ public class Book
         PublishDate = publishDate;
         ISBN = isbn;
         Price = price;
+        Id = id ?? 0;
     }
+    public int? Id { get; private set; }
     public string Name { get; private set; }
     private List<Author> _authors { get; set; }
     public IReadOnlyList<Author> Authors => _authors ?? (_authors = new List<Author>());
