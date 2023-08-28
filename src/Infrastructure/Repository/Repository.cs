@@ -31,8 +31,10 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         Entities.Remove(entity);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
-    public async Task<TEntity> FindById(CancellationToken cancellationToken, params object[] ids)
+    public async Task<List<TEntity>> FindById(CancellationToken cancellationToken, params object[] ids)
     {
-        return await Entities.FindAsync(ids, cancellationToken).ConfigureAwait(false);
+        var result = await Entities.FindAsync(ids, cancellationToken).ConfigureAwait(false);
+
+        return new List<TEntity> { result };
     }
 }

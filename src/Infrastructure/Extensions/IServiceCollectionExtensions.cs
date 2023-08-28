@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Infrastructure.Data;
 using Domain.Entities;
 using Infrastructure.Repository;
+using Domain.Entities.BookAggregate;
 
 namespace Infrastructure.Extensions;
 
@@ -34,5 +35,6 @@ public static class IServiceCollectionExtensions
     private static void AddRepositories(this IServiceCollection services)
     {
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IBookRepository, BookRepository>();
     }
 }

@@ -19,7 +19,9 @@ public class Service<TEntity> : IService<TEntity> where TEntity : class
 
     public async Task<TEntity> FindById(CancellationToken cancellationToken, params object[] ids)
     {
-        return await _repository.FindById(cancellationToken, ids);
+        var result = await _repository.FindById(cancellationToken, ids);
+
+        return result.Last();
     }
 
     public async Task<IEnumerable<TEntity>> GetAll(CancellationToken cancellationToken)
