@@ -25,7 +25,7 @@ public class BookService: IBookService
         if (author == null)
             throw new Exception("There is no author");
 
-        await _bookRepository.AddOrUpdate(new Book(entity.Name, author.Select(x => new Domain.Entities.BookAggregate.Author { Id = x.Id , Name = x.Name}).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
+        await _bookRepository.AddOrUpdate(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author { Id = x.Id , Name = x.Name}).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
     }
 
     public async Task<BookDto> FindById(CancellationToken cancellationToken, params object[] ids)
@@ -35,11 +35,11 @@ public class BookService: IBookService
         return new BookDto { Price = result.Price, Name = result.Name, ISBN = result.ISBN, GenerId = result.GenerId, Id = result.Id.Value, PublishDate = result.PublishDate, Authors = result.Authors.Select(x => new AuthorDto { Id = x.Id}).ToList() };
     }
 
-    public async Task<IEnumerable<BookDto>> GetAll(CancellationToken cancellationToken)
+    public async Task<IEnumerable<BookDto>> GetAll(string name, string desc, int pageNo, int pageSize, CancellationToken cancellationToken)
     {
-        var result = await _bookRepository.GetAll(cancellationToken);
+        var result = await _bookRepository.GetAll(name, desc, cancellationToken, pageNo, pageSize);
 
-        return result.Select(x => new BookDto { Price = x.Price, Name = x.Name, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id }).ToList() }).ToList();
+        return result.Select(x => new BookDto { Price = x.Price, Description = x.Description, Name = x.Name, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id }).ToList() }).ToList();
     }
 
     public async Task Remove(int id, CancellationToken cancellationToken)

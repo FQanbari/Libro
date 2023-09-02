@@ -32,12 +32,14 @@ public class BookRepository : IBookRepository
 
     public async Task<Book> FindById(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
+        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
-    public Task<List<Book>> GetAll(CancellationToken cancellationToken)
+    public Task<List<Book>> GetAll(string name, string desc, CancellationToken cancellationToken, int pageNo = 1, int pageSize = 10)
     {
-        return _dbContext.Books.Include(x => x.Authors).Select(x => new Book(x.Name, x.Authors.Select(a => new Author { Id = a.Id}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id)).ToListAsync();
+        return _dbContext.Books.Include(x => x.Authors). Where(x => (name == null || x.Name.Contains(name)) && (desc == null || x.Description.Contains(desc))).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id))
+                           .Skip((pageNo - 1) * pageSize)
+               .Take(pageSize).ToListAsync();
     }
 
     public async Task Remove(Book domain, CancellationToken cancellationToken)

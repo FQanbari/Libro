@@ -5,7 +5,7 @@ namespace Infrastructure.Data.Models;
 public class Book : BaseEntity
 {
     public string Name { get; set; }
-
+    public string Description { get; set; }
     public int GenerId { get; set; }
     public int ISBN { get; set; }
     public decimal Price { get; set; }

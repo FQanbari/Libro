@@ -21,9 +21,9 @@ public class BookController : ApiBaseController
     /// <param name="cancellationToken"></param>
     /// <returns>List of books</returns>
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll(string name, string desc, int pageNo, int pageSize ,CancellationToken cancellationToken)
     {
-        var books = await _bookService.GetAll(cancellationToken);
+        var books = await _bookService.GetAll(name, desc, pageNo, pageSize, cancellationToken);
 
         return Ok(books);
     }

@@ -5,6 +5,7 @@ namespace Application.Dtos;
 public class BookDto : BaseDto
 {
     public string Name { get; set; }
+    public string Description { get; set; }
     public int GenerId { get; set; }
     public int ISBN { get; set; }
     public decimal Price { get; set; }
