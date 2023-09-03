@@ -102,12 +102,12 @@ public static class ApplicationDbContextSeed
     {
         return new List<Author>
         {
-            new Author{ Name = "Leo Tolstoy"},
-            new Author{ Name = "J.K Rowling"},
-            new Author{ Name = "Rebecca Zanetti"},
-            new Author{ Name = "Stephanie Bond"},
-            new Author{ Name = "Jeff Carson"},
-            new Author{ Name = "Uncle Bob"},
+            new Author{ Name = "Leo Tolstoy", HomeTown = 1},
+            new Author{ Name = "J.K Rowling", HomeTown = 2},
+            new Author{ Name = "Rebecca Zanetti", HomeTown = 3},
+            new Author{ Name = "Stephanie Bond", HomeTown = 4},
+            new Author{ Name = "Jeff Carson", HomeTown = 5},
+            new Author{ Name = "Uncle Bob", HomeTown = 6},
         };
     }
 }

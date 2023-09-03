@@ -4,6 +4,7 @@ using Infrastructure.Data.Models;
 using Infrastructure.Data.Models.Base;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Author = Domain.Entities.BookAggregate.Author;
 using Book = Domain.Entities.BookAggregate.Book;
 
@@ -20,7 +21,7 @@ public class BookRepository : IBookRepository
     public async Task AddOrUpdate(Book domain, CancellationToken cancellationToken)
     {
         Assert.NotNull(domain, nameof(domain));
-        var model = new Data.Models.Book { Id = domain.Id.Value, Name = domain.Name, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate };
+        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Name, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate };
         if(domain.Id != 0)
             _dbContext.Books.Update(model);
         else
@@ -35,11 +36,39 @@ public class BookRepository : IBookRepository
         return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
-    public Task<List<Book>> GetAll(string name, string desc, CancellationToken cancellationToken, int pageNo = 1, int pageSize = 10)
+    public async Task<IQueryable<Book>> GetAll(string searchby, string searchfor, string sortby, CancellationToken cancellationToken)
     {
-        return _dbContext.Books.Include(x => x.Authors). Where(x => (name == null || x.Name.Contains(name)) && (desc == null || x.Description.Contains(desc))).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id))
-                           .Skip((pageNo - 1) * pageSize)
-               .Take(pageSize).ToListAsync();
+        var ba = _dbContext.Books.Include(x => x.Authors).Select(x => new { x.Id, x.Name, x.Description, x.ISBN, x.Authors, x.PublishDate, x.GenerId, x.Price }).AsEnumerable();
+        
+        Expression<Func<Author, bool>> predicate = (author) => false;
+
+        if (searchby == "gener" && searchfor != null)
+        {            
+            ba = ba.Where(x => x.GenerId == int.Parse(searchfor));
+        }
+        if (searchby == "homeTown" && searchfor != null)
+        {
+            ba = ba.Where(x => x.Authors.Any(a => a.HomeTown == int.Parse(searchfor)));
+        }
+        if (searchby == "price" && searchfor != null)
+        {
+            ba = ba.Where(x => x.Price == decimal.Parse(searchfor));
+        }
+        var result = ba.Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name }).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id));
+       
+        switch (sortby)
+        {
+            case "price":
+                result.OrderBy(x => x.Price).AsQueryable(); 
+                break;
+            case "priceDesc":
+                result.OrderByDescending(x => x.Price).AsQueryable();
+                break;
+            default:
+                break;
+        }
+
+        return result.AsQueryable();
     }
 
     public async Task Remove(Book domain, CancellationToken cancellationToken)

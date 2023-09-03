@@ -1,6 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Interfaces;
-using Infrastructure.Data.Models;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controllers.Api;
 
@@ -21,9 +21,9 @@ public class BookController : ApiBaseController
     /// <param name="cancellationToken"></param>
     /// <returns>List of books</returns>
     [HttpGet]
-    public async Task<IActionResult> GetAll(string name, string desc, int pageNo, int pageSize ,CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken, string searchby = "", string searchfor = "", int? page = null, string sortby = "")
     {
-        var books = await _bookService.GetAll(name, desc, pageNo, pageSize, cancellationToken);
+        var books = await _bookService.GetAll(searchby, searchfor, sortby, cancellationToken).ToPaging(page ?? 1, 5);
 
         return Ok(books);
     }
