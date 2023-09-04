@@ -1,10 +1,7 @@
-﻿using Application.Dtos;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Entities.BookAggregate;
-using Infrastructure.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
 using Author = Infrastructure.Data.Models.Author;
 using Book = Domain.Entities.BookAggregate.Book;
 

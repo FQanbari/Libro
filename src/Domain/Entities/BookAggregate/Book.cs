@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities.BookAggregate;
+﻿using Domain.Entities.MemberAggregate;
+
+namespace Domain.Entities.BookAggregate;
 
 public class Book
 {
@@ -29,4 +31,24 @@ public class Book
     public DateTime PublishDate { get; private set;}
     public int ISBN { get; private set;}
     public decimal Price { get; private set;}
+    public void UpdateTitle(string newTitle)
+    {
+        // TODO: Allows updating the title of the book.
+    }
+    public void UpdateGenre(int newGenreId)
+    {
+        // TODO: Allows changing the genre of the book.
+    }
+    public void SetPrice(decimal newPrice)
+    {
+        // TODO: Sets a new price for the book.
+    }
+    public void AddAuthor(int authorId)
+    {
+        // TODO: Associates an author with the book.
+    }
+    public void RemoveAuthor(int authorId)
+    {
+        // TODO: Disassociates an author from the book.
+    }
 }

@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Data.Models;
 
-namespace Application.Dtos;
+namespace Application.DTOs;
 
 public class BookDto : BaseDto
 {
@@ -21,4 +21,8 @@ public class AuthorDto : BaseDto
 public class BaseDto
 {
     public int Id { get; set; }
+}
+public class MemberDto : BaseDto
+{
+
 }
