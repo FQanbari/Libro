@@ -22,7 +22,7 @@ public class BookService: IBookService
         if (author == null)
             throw new Exception("There is no author");
 
-        await _bookRepository.AddOrUpdate(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author { Id = x.Id , Name = x.Name}).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
+        await _bookRepository.AddOrUpdate(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author (x.Id, x.Name, x.City.Id)).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
     }
 
     public async Task<BookDto> FindById(CancellationToken cancellationToken, params object[] ids)
