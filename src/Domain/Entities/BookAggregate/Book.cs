@@ -6,7 +6,7 @@ public class Book
 {
     public Book(string name, string description, List<Author> authors, int generId, DateTime publishDate, int isbn, decimal price, int? id = null)
     {
-        Name = name;
+        Title = name;
         Description = description;
         _authors = authors;
         GenerId = generId;
@@ -16,39 +16,51 @@ public class Book
         Id = id ?? 0;
     }
     public int? Id { get; private set; }
-    public string Name { get; private set; }
+    public string Title { get; private set; }
     public string Description { get; private set; }
     private List<Author> _authors { get; set; }
     public IReadOnlyList<Author> Authors => _authors ?? (_authors = new List<Author>());
-    public void AddAuthor(Author author)
-    {
-        if (!_authors.Any(x => x.Id == author.Id))
-            throw new ArgumentException("Author exist.");
-
-        _authors.Add(author);
-    }
     public int GenerId { get; set; }
     public DateTime PublishDate { get; private set;}
     public int ISBN { get; private set;}
     public decimal Price { get; private set;}
     public void UpdateTitle(string newTitle)
     {
-        // TODO: Allows updating the title of the book.
+        if (!string.IsNullOrWhiteSpace(newTitle))
+        {
+            Title = newTitle;
+        }
     }
-    public void UpdateGenre(int newGenreId)
+
+    public void UpdateGenre(int newGenre)
     {
-        // TODO: Allows changing the genre of the book.
+        if (newGenre > 0)
+        {
+            GenerId = newGenre;
+        }
     }
+
     public void SetPrice(decimal newPrice)
     {
-        // TODO: Sets a new price for the book.
+        if (newPrice >= 0)
+        {
+            Price = newPrice;
+        }
     }
-    public void AddAuthor(int authorId)
+
+    public void AddAuthor(Author author)
     {
-        // TODO: Associates an author with the book.
+        if (author != null && !Authors.Any(a => a.Id == author.Id))
+        {
+            _authors.Add(author);
+        }
     }
-    public void RemoveAuthor(int authorId)
+
+    public void RemoveAuthor(Author author)
     {
-        // TODO: Disassociates an author from the book.
+        if (author != null)
+        {
+            _authors.Remove(author);
+        }
     }
 }

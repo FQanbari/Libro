@@ -27,21 +27,21 @@ public class BookService: IBookService
 
     public async Task<BookDto> FindById(CancellationToken cancellationToken, params object[] ids)
     {
-        var result = await _bookRepository.FindById(1, cancellationToken);
+        var result = await _bookRepository.GetById(1, cancellationToken);
 
-        return new BookDto { Price = result.Price, Name = result.Name, ISBN = result.ISBN, GenerId = result.GenerId, Id = result.Id.Value, PublishDate = result.PublishDate, Authors = result.Authors.Select(x => new AuthorDto { Id = x.Id}).ToList() };
+        return new BookDto { Price = result.Price, Name = result.Title, ISBN = result.ISBN, GenerId = result.GenerId, Id = result.Id.Value, PublishDate = result.PublishDate, Authors = result.Authors.Select(x => new AuthorDto { Id = x.Id}).ToList() };
     }
 
     public async Task<IQueryable<BookDto>> GetAll(string searchby, string searchfor, string sortby, CancellationToken cancellationToken)
     {
         var result = await _bookRepository.GetAll(searchby, searchfor, sortby, cancellationToken);
 
-        return result.Select(x => new BookDto { Price = x.Price, Description = x.Description, Name = x.Name, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id }).ToList() });
+        return result.Select(x => new BookDto { Price = x.Price, Description = x.Description, Name = x.Title, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id }).ToList() });
     }
 
     public async Task Remove(int id, CancellationToken cancellationToken)
     {
-        var book = await _bookRepository.FindById(id, cancellationToken);
+        var book = await _bookRepository.GetById(id, cancellationToken);
         if (book == null)
             throw new Exception("The book is not found");
         await _bookRepository.Remove(book, cancellationToken);

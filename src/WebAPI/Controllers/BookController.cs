@@ -1,4 +1,4 @@
-﻿using Application.Dtos;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Mvc;

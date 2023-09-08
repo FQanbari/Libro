@@ -1,4 +1,4 @@
-﻿using Domain.Entities.ReservationAggregate;
+﻿using Domain.Entities.BookReservationAggregate;
 using Infrastructure.Data.Models.Base;
 
 namespace Infrastructure.Data.Models;

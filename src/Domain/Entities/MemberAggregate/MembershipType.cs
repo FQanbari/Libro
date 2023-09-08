@@ -1,6 +1,7 @@
 ﻿namespace Domain.Entities.MemberAggregate;
 
-public enum MembershipType
+public enum MembershipType : byte
 {
-    VIP
+    Regular = 1,
+    Premium
 }

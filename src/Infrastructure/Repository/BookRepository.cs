@@ -21,7 +21,7 @@ public class BookRepository : IBookRepository
     public async Task AddOrUpdate(Book domain, CancellationToken cancellationToken)
     {
         Assert.NotNull(domain, nameof(domain));
-        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Name, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate };
+        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Title, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate };
         if(domain.Id != 0)
             _dbContext.Books.Update(model);
         else
@@ -31,9 +31,9 @@ public class BookRepository : IBookRepository
 
     }
 
-    public async Task<Book> FindById(int id, CancellationToken cancellationToken)
+    public async Task<Book> GetById(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name}).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
+        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author(a.Id, a.Name, a.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
     public async Task<IQueryable<Book>> GetAll(string searchby, string searchfor, string sortby, CancellationToken cancellationToken)
@@ -54,7 +54,7 @@ public class BookRepository : IBookRepository
         {
             ba = ba.Where(x => x.Price == decimal.Parse(searchfor));
         }
-        var result = ba.Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author { Id = a.Id, Name = a.Name }).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id));
+        var result = ba.Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author(a.Id, a.Name, a.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id));
        
         switch (sortby)
         {
