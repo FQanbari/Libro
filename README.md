@@ -82,6 +82,6 @@ OAuth: Understand OAuth at [here](https://roadmap.sh/guides/oauth).
 JWT Authentication: Get insights into JWT authentication at [here](https://roadmap.sh/guides/jwt-authentication) and [here](https://jwt.io/introduction).
 Introduction to OAuth 2: Learn about OAuth 2 at [here](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2).
 OpenID Connect: Explore OpenID Connect at [here](https://openid.net/developers/how-connect-works/).
-- Design Patterns:
-All design patterns available on this page: [here](https://learn.microsoft.com/en-us/azure/architecture/patterns/).
+- **Design Patterns:
+All design patterns are available on this page: [here](https://learn.microsoft.com/en-us/azure/architecture/patterns/).
 As well as all subcategories on this page: [here](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/).
