@@ -1,4 +1,8 @@
 ﻿using Domain.Entities.BookReservationAggregate;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Domain.Entities.MemberAggregate;
 
@@ -53,14 +57,31 @@ public class Member
 
     public string GenerateJwtToken()
     {
-        // Implement logic to generate a JWT token for authenticated members.
-        // You can use a JWT library like System.IdentityModel.Tokens.Jwt for this purpose.
-        // Example:
-        // var token = JwtHelper.GenerateToken(MemberId, FullName, MembershipType);
-        // return token;
+        var securityKey = Encoding.UTF8.GetBytes("*L!b3r0O@{2023}*"); // longer than 16 character
+        var sign = new SigningCredentials(new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);
+        var claims = _getClaims();
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Issuer = "Libro org.",
+            Audience = "Libro org.",
+            IssuedAt = DateTime.Now,
+            NotBefore = DateTime.Now,
+            Expires = DateTime.Now.AddHours(1),
+            SigningCredentials = sign,
+            Subject = new ClaimsIdentity(claims)
+        };
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var securityToken = tokenHandler.CreateToken(descriptor);
+        return tokenHandler.WriteToken(securityToken);
+    }
 
-        // For simplicity, let's return a placeholder token here.
-        return "JWT_TOKEN_PLACEHOLDER";
+    private IEnumerable<Claim> _getClaims()
+    {
+        return new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, Username),
+            new Claim(ClaimTypes.NameIdentifier, Encoding.UTF8.GetBytes(PhoneNumber).ToString())
+        };
     }
 
     public void InvalidateJwtToken(string token)

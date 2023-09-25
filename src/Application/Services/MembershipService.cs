@@ -12,17 +12,8 @@ public class MembershipService : IMembershipService
     {
         this._memberRepository = memberRepository;
     }
-    public Task GenerateAndSendOtp(int memberId, ISMSService smsService)
-    {
-        throw new NotImplementedException();
-    }
 
-    public Task InvalidateToken(int memberId, IJWTService jwtService)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task PurchasePremiumMembership(int memberId)
+    public async Task Premium(int memberId)
     {
         // Retrieve the member from the repository.
         var member = await _memberRepository.GetById(memberId);
@@ -38,10 +29,5 @@ public class MembershipService : IMembershipService
         _memberRepository.Update(member);
 
         //_unitOfWork.Commit();
-    }
-
-    public Task VerifyOtpAndGenerateToken(int memberId, string inputOtp, IJWTService jwtService)
-    {
-        throw new NotImplementedException();
     }
 }
