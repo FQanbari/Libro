@@ -10,22 +10,23 @@ namespace WebAPI.Controllers;
 
 public class MemeberController : ApiBaseController
 {
-    private readonly IMemberService _memberservice;
     private readonly IOTPService _otp;
     private readonly ISMSService _sms;
     private readonly IJWTService _jwt;
     private readonly IThrottler _throttler;
     private readonly IMembershipService _memberShipService;
+    private readonly IMemberService _memberServie;
 
-    public MemeberController(IMemberService memberservice, IOTPService opt, ISMSService sms, 
-        IJWTService jwt, IThrottler throttler, IMembershipService membershipService)
+    public MemeberController(IOTPService opt, ISMSService sms, 
+        IJWTService jwt, IThrottler throttler, IMembershipService membershipService,
+        IMemberService memberService)
     {
-        this._memberservice = memberservice;
         _otp = opt;
         _sms = sms;
         _jwt = jwt;
         _throttler = throttler;
         _memberShipService = membershipService;
+        _memberServie = memberService;
     }
     
     [HttpGet]
@@ -34,7 +35,8 @@ public class MemeberController : ApiBaseController
         if (!(await _throttler.TryGet()))
             throw new Exception("You Can't Login. try another time");
 
-        var otp = await _otp.GenerateOtp(phone);
+        var otp = await _otp.Generate(phone);
+
         await _sms.SendSms(phone, $"Your verfiy code is: {otp}");
         return otp;
     }
@@ -42,7 +44,8 @@ public class MemeberController : ApiBaseController
     [HttpPost]
     public async Task<IActionResult> Login([FromBody] LoginRequestModel model)
     {
-        if (!(await _otp.VerifyOtp(model.PhoneNumber, model.Otp)))
+        var verifiy = await _otp.Verify(model.PhoneNumber, model.Otp);
+        if (!verifiy)
             throw new Exception("your verify code is not valid.");
 
         var token = await _jwt.GenerateToken(model.PhoneNumber);
@@ -60,6 +63,7 @@ public class MemeberController : ApiBaseController
     public async Task<IActionResult> Signin([FromBody] RegisterRequestModel model)
     {
         // TODO: Signin
+        await _memberServie.Add(model.UserName, model.PhoneNumber, model.Password.Hash());
         return Ok();
     }
 

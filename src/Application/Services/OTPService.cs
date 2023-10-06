@@ -11,18 +11,18 @@ public class OTPService : IOTPService
     {
         this._memberRepository = memberRepository;
     }
-    public async Task<string> GenerateOtp(string phone)
+    public async Task<string> Generate(string phone)
     {
         var user = await _memberRepository.GetByPhoneNumber(phone);
         if (user == null)
             throw new Exception("User is not exist.");
 
         user.GenerateOtp();
-
+        await _memberRepository.AddOrUpdateOtp(user.Id.Value, user.OtpCode, user.OtpExpirationTime);
         return user.OtpCode;
-    }
+    }   
 
-    public async Task<bool> VerifyOtp(string phone, string inputOtp)
+    public async Task<bool> Verify(string phone, string inputOtp)
     {
         var user = await _memberRepository.GetByPhoneNumber(phone);
         if (user == null)

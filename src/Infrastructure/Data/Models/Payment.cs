@@ -12,6 +12,4 @@ public class Payment : BaseEntity
     public DateTime CreateOn { get; set; }
     public int Count { get; set; }
 
-    public ICollection<User> Users { get; set; }
-    public ICollection<Book> Book { get; set; }
 }

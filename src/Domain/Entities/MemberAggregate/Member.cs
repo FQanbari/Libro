@@ -57,22 +57,45 @@ public class Member
 
     public string GenerateJwtToken()
     {
-        var securityKey = Encoding.UTF8.GetBytes("*L!b3r0O@{2023}*"); // longer than 16 character
-        var sign = new SigningCredentials(new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);
+        //var securityKey = Encoding.UTF8.GetBytes("L!b3r0O.CO@{2023}"); // longer than 16 character
+        //var sign = new SigningCredentials(new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);
+        //var claims = _getClaims();
+        //var descriptor = new SecurityTokenDescriptor
+        //{
+        //    Issuer = "Libro org.",
+        //    Audience = "Libro org.",
+        //    IssuedAt = DateTime.Now,
+        //    NotBefore = DateTime.Now,
+        //    Expires = DateTime.Now.AddHours(1),
+        //    SigningCredentials = sign,
+        //    Subject = new ClaimsIdentity(claims)
+        //};
+        //var tokenHandler = new JwtSecurityTokenHandler();
+        //var securityToken = tokenHandler.CreateToken(descriptor);
+        //return tokenHandler.WriteToken(securityToken);
+        var secretKey = Encoding.UTF8.GetBytes("L!b3r0O.CO@{2023}"); //longer than 16 character
+        var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature);
+
+        var encryptionkey = Encoding.UTF8.GetBytes("16CharEncryptKey"); //must be 16 character
+        var encryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionkey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
+
         var claims = _getClaims();
         var descriptor = new SecurityTokenDescriptor
         {
             Issuer = "Libro org.",
             Audience = "Libro org.",
             IssuedAt = DateTime.Now,
-            NotBefore = DateTime.Now,
             Expires = DateTime.Now.AddHours(1),
-            SigningCredentials = sign,
+            SigningCredentials = signingCredentials,
+            EncryptingCredentials = encryptingCredentials,
             Subject = new ClaimsIdentity(claims)
         };
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var securityToken = tokenHandler.CreateToken(descriptor);
-        return tokenHandler.WriteToken(securityToken);
+        var jwt = tokenHandler.WriteToken(securityToken);
+
+        return jwt;
     }
 
     private IEnumerable<Claim> _getClaims()
@@ -104,7 +127,11 @@ public class Member
             throw new Exception("Premium membership is already active.");
         }
     }
-    
+    public void PurchaseRegularMembership()
+    {
+        MembershipType = MembershipType.Regular;
+        MembershipExpiryDate = DateTime.Now.AddMonths(1);
+    }
     public void MakeReservation(int bookId)
     {
         

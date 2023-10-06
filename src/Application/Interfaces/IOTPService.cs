@@ -2,6 +2,6 @@
 
 public interface IOTPService
 {
-    Task<string> GenerateOtp(string phone);
-    Task<bool> VerifyOtp(string phone, string inputOtp);
+    Task<string> Generate(string phone);
+    Task<bool> Verify(string phone, string inputOtp);
 }

@@ -5,7 +5,6 @@ namespace Infrastructure.Data.Models;
 
 public class MemberShip : BaseEntity
 {
-    public string Name { get; set; }
     public DateTime CreatOn { get; set; }
     public DateTime Expiration { get; set; }
     public short Type { get; set; }

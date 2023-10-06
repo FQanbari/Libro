@@ -22,7 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<Identity> Identities { get; set; }
-    public DbSet<Payment> Payments { get; set; }
+    //public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
