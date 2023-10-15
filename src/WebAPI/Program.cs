@@ -2,8 +2,8 @@ using Infrastructure.Data;
 using Infrastructure.Extensions;
 using Application.Extensions;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
+using Application.Services;
 using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,8 +16,9 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
     c.EnableAnnotations();
 });
-
-builder.Services.AddApplicationLayer();
+using var loggerFactory =
+            LoggerFactory.Create(lb => lb.AddConfiguration(builder.Configuration));
+builder.Services.AddApplicationLayer(builder.Configuration, loggerFactory);
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 
 var app = builder.Build();

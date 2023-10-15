@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Application.Throtting;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -71,5 +72,9 @@ public class MemeberController : ApiBaseController
     public async Task PremiumMembership()
     {
         _memberShipService.Premium(User.Id());
+    }
+    public async Task<AuthorityDto> GetTokens()
+    {
+        return await _jwt.GetTokens(User.Id());
     }
 }

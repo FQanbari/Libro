@@ -44,6 +44,16 @@ public class MemberRepository : IMemberRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task AddToken(string token, int userId)
+    {
+        var identity = await _dbContext.Identities.Where(x => x.Id == userId).AsNoTracking().FirstOrDefaultAsync();
+        identity.Token = token;
+        identity.TokenStatus = (short)TokenStatusType.Valid;
+        identity.ExpirationToken = DateTime.Now.AddMinutes(15);
+        _dbContext.Identities.Update(identity);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public Task<Member> GetById(int memberId)
     {
         throw new NotImplementedException();

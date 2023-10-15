@@ -10,7 +10,7 @@ public class Member
 {
     public Member(string name, string family, string username, string phoneNumber, DateTime expiryDate, 
         MembershipType membershipType, string optCode,DateTime otpExpirationTime, decimal payments, int? id = null, 
-        List<int> reservations = null, List<string> invalidToken = null)
+        List<int> reservations = null, List<IdentityToken> tokens = null)
     {
         Id = id;
         Name = name;
@@ -22,7 +22,7 @@ public class Member
         OtpCode = optCode;
         OtpExpirationTime = otpExpirationTime;
         _reservations = reservations ?? new List<int>();
-        _invalidTokens = invalidToken ?? new List<string>();
+        _invalidTokens = tokens ?? new List<IdentityToken>();
         TotalPayments = payments;
     }
     public int? Id { get; set; }
@@ -37,8 +37,8 @@ public class Member
     private List<int> _reservations { get; set; }
     public IReadOnlyList<int> Reservations => _reservations;
     public decimal TotalPayments { get; private set; }
-    private List<string> _invalidTokens { get; set; } // Store invalid JWT tokens.
-    private IReadOnlyList<string> InvalidTokens => _invalidTokens;
+    private List<IdentityToken> _invalidTokens { get; set; } // Store invalid JWT tokens.
+    public IReadOnlyList<IdentityToken> InvalidTokens => _invalidTokens;
 
     public void GenerateOtp()
     {
@@ -57,45 +57,16 @@ public class Member
 
     public string GenerateJwtToken()
     {
-        //var securityKey = Encoding.UTF8.GetBytes("L!b3r0O.CO@{2023}"); // longer than 16 character
-        //var sign = new SigningCredentials(new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);
-        //var claims = _getClaims();
-        //var descriptor = new SecurityTokenDescriptor
-        //{
-        //    Issuer = "Libro org.",
-        //    Audience = "Libro org.",
-        //    IssuedAt = DateTime.Now,
-        //    NotBefore = DateTime.Now,
-        //    Expires = DateTime.Now.AddHours(1),
-        //    SigningCredentials = sign,
-        //    Subject = new ClaimsIdentity(claims)
-        //};
-        //var tokenHandler = new JwtSecurityTokenHandler();
-        //var securityToken = tokenHandler.CreateToken(descriptor);
-        //return tokenHandler.WriteToken(securityToken);
-        var secretKey = Encoding.UTF8.GetBytes("L!b3r0O.CO@{2023}"); //longer than 16 character
-        var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature);
-
-        var encryptionkey = Encoding.UTF8.GetBytes("16CharEncryptKey"); //must be 16 character
-        var encryptingCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionkey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
-
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("The custom Secret key for L!b3r0O CO @ {2023}"));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         var claims = _getClaims();
-        var descriptor = new SecurityTokenDescriptor
-        {
-            Issuer = "Libro org.",
-            Audience = "Libro org.",
-            IssuedAt = DateTime.Now,
-            Expires = DateTime.Now.AddHours(1),
-            SigningCredentials = signingCredentials,
-            EncryptingCredentials = encryptingCredentials,
-            Subject = new ClaimsIdentity(claims)
-        };
+        var token = new JwtSecurityToken("Libro org.",
+            "Libro org.",
+            claims,
+            expires: DateTime.Now.AddMinutes(15),
+            signingCredentials: credentials);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var securityToken = tokenHandler.CreateToken(descriptor);
-        var jwt = tokenHandler.WriteToken(securityToken);
-
-        return jwt;
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     private IEnumerable<Claim> _getClaims()
@@ -110,7 +81,7 @@ public class Member
     public void InvalidateJwtToken(string token)
     {
         // Implement logic to mark a JWT token as invalid.
-        _invalidTokens.Add(token);
+        _invalidTokens.Add(new IdentityToken { Token = token, Status = TokenStatusType.Expired});
     }
 
     public void PurchasePremiumMembership()
@@ -159,4 +130,13 @@ public class Member
 
         return discount;
     }
+    
+}
+
+public class IdentityToken
+{
+    public int Id { get; set; }
+    public string Token { get; set; }
+    public TokenStatusType Status { get; set; }
+    public DateTime CreateOn { get; set; }
 }

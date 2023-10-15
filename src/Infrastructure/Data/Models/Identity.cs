@@ -11,8 +11,9 @@ public class Identity : BaseEntity
     public string? Token { get; set; }
     public short TokenStatus { get; set; }
     public DateTime CreatOn { get; set; }
+    public int UserId { get; set;}
 
 
-    [ForeignKey(nameof(Id))]
+    [ForeignKey(nameof(UserId))]
     public User User { get; set; }
 }

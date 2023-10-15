@@ -8,4 +8,5 @@ public interface IMemberRepository
     Task Update(Member member);
     Task Add(string userName, string phoneNumber, string password);
     Task AddOrUpdateOtp(int id, string inputOtp, DateTime expirationOtp);
+    Task AddToken(string token, int userId);
 }

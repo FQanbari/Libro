@@ -1,20 +1,19 @@
 ﻿using Application.Interfaces;
+using Polly;
 
 namespace Application.Services;
 
-public class KavenegarSmsService : ISMSService
+public class SMSService : ISMSService
 {
-    public async Task<bool> SendSms(string phoneNumber, string message)
+    private readonly ISmsProvider _smsProvider;
+
+    public SMSService(ISmsProvider smsProvider)
     {
-        // Implement Kavenegar SMS sending logic.
-        return true;
+        _smsProvider = smsProvider;
     }
-}
-public class SignalCompanySmsService : ISMSService
-{
+
     public async Task<bool> SendSms(string phoneNumber, string message)
     {
-        // Implement Signal Company SMS sending logic.
-        return true;
+        return await _smsProvider.SendSms(phoneNumber, message);
     }
 }
