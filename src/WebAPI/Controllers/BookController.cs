@@ -1,6 +1,9 @@
-﻿using Application.DTOs;
+﻿using Application.CQRS.Commands.Book;
+using Application.CQRS.Queries.Book;
+using Application.DTOs;
 using Application.Interfaces;
 using Infrastructure.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controllers.Api;
 
@@ -8,11 +11,13 @@ namespace WebAPI.Controllers;
 
 public class BookController : ApiBaseController
 {
+    private readonly IMediator _mediatR;
     private readonly IBookService _bookService;
 
-    public BookController(IBookService bookService)
+    public BookController(IMediator mediatR, IBookService bookService)
     {
-        this._bookService = bookService;
+        _mediatR = mediatR;
+        _bookService = bookService;
     }
 
     /// <summary>
@@ -23,7 +28,7 @@ public class BookController : ApiBaseController
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken, string searchby = "", string searchfor = "", int? page = null, string sortby = "")
     {
-        var books = await _bookService.GetAll(searchby, searchfor, sortby, cancellationToken).ToPaging(page ?? 1, 5);
+        var books = await _mediatR.Send(new GetAllBookQueries(searchby, searchfor, page ?? 1, sortby), cancellationToken);
 
         return Ok(books);
     }
@@ -37,9 +42,9 @@ public class BookController : ApiBaseController
     [HttpPost]
     public async Task<IActionResult> Add(BookDto book, CancellationToken cancellationToken)
     {
-        await _bookService.AddOrUpdate(book, cancellationToken);
+        var model = await _mediatR.Send(new AddBookCommand(book.Name, book.Description, book.GenerId, book.ISBN, book.Price, book.PublishDate, book.Authors.Select(x => x.Id).ToList(), book.Id), cancellationToken);
 
-        return Ok(book);
+        return Ok(model);
     }
 
     /// <summary>
@@ -51,9 +56,9 @@ public class BookController : ApiBaseController
     [HttpPut]
     public async Task<IActionResult> Update(BookDto book, CancellationToken cancellationToken)
     {
-        await _bookService.AddOrUpdate(book, cancellationToken);
+        var model = await _mediatR.Send(new UpdateBookCommand(book.Id, book.Name, book.Description, book.GenerId, book.ISBN, book.Price, book.PublishDate, book.Authors.Select(x => x.Id).ToList()), cancellationToken);
 
-        return Ok(book);
+        return Ok(model);
     }
     /// <summary>
     /// Remove book
@@ -64,7 +69,7 @@ public class BookController : ApiBaseController
     [HttpPost("{id}")]
     public async Task<IActionResult> Remove(int id, CancellationToken cancellationToken)
     {
-        await _bookService.Remove(id, cancellationToken);
+        await _mediatR.Send(new RemoveBookCommand(id), cancellationToken);        
 
         return Ok();
     }

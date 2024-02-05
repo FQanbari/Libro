@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
+using System.Reflection;
 
 namespace Application.Extensions;
 
@@ -20,6 +21,7 @@ public static class IServiceCollectionExtensions
         //services.AddValidators();
         services.AddServices();
         services.AddPolicy(loggerFactory, configuration);
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     }
     private static void AddServices(this IServiceCollection services)
     {

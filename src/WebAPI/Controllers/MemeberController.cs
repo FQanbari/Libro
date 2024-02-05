@@ -73,7 +73,8 @@ public class MemeberController : ApiBaseController
     {
         _memberShipService.Premium(User.Id());
     }
-    public async Task<AuthorityDto> GetTokens()
+    [HttpGet]
+    public async Task<List<AuthorityDto>> GetTokens()
     {
         return await _jwt.GetTokens(User.Id());
     }

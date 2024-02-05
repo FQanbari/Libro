@@ -17,28 +17,16 @@ public class BookRepository : IBookRepository
     public BookRepository(ApplicationDbContext dbContext)
     {
         this._dbContext = dbContext;
-    }
-    public async Task AddOrUpdate(Book domain, CancellationToken cancellationToken)
-    {
-        Assert.NotNull(domain, nameof(domain));
-        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Title, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate };
-        if(domain.Id != 0)
-            _dbContext.Books.Update(model);
-        else
-            await _dbContext.Books.AddAsync(model, cancellationToken).ConfigureAwait(false);
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-    }
+    }   
 
     public async Task<Book> GetById(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author(a.Id, a.Name, a.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
+        return await _dbContext.Books.Include(x => x.Authors).Where(x => x.Id == id).Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author(a.Id, a.Name, a.City.Name, a.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price,x.Id)).FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
     public async Task<IQueryable<Book>> GetAll(string searchby, string searchfor, string sortby, CancellationToken cancellationToken)
     {
-        var ba = _dbContext.Books.Include(x => x.Authors).Select(x => new { x.Id, x.Name, x.Description, x.ISBN, x.Authors, x.PublishDate, x.GenerId, x.Price }).AsEnumerable();
+        var ba = _dbContext.Books.Include(x => x.BookAuthors).ThenInclude(x => x.Author).ThenInclude(x => x.City).Select(x => new { x.Id, x.Name, x.Description, x.ISBN, x.BookAuthors, x.PublishDate, x.GenerId, x.Price }).AsEnumerable();
         
         Expression<Func<Author, bool>> predicate = (author) => false;
 
@@ -48,13 +36,13 @@ public class BookRepository : IBookRepository
         }
         if (searchby == "homeTown" && searchfor != null)
         {
-            ba = ba.Where(x => x.Authors.Any(a => a.HomeTown == int.Parse(searchfor)));
+            ba = ba.Where(x => x.BookAuthors.Any(a => a.Author.HomeTown == int.Parse(searchfor)));
         }
         if (searchby == "price" && searchfor != null)
         {
             ba = ba.Where(x => x.Price == decimal.Parse(searchfor));
         }
-        var result = ba.Select(x => new Book(x.Name, x.Description, x.Authors.Select(a => new Author(a.Id, a.Name, a.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id));
+        var result = ba.Select(x => new Book(x.Name, x.Description, x.BookAuthors.Select(a => new Author(a.Author.Id, a.Author.Name, a.Author.City.Name, a.Author.City.Id)).ToList(), x.GenerId, x.PublishDate, x.ISBN, x.Price, x.Id));
        
         switch (sortby)
         {
@@ -77,5 +65,28 @@ public class BookRepository : IBookRepository
         var book = await _dbContext.Books.Where(x => x.Id == domain.Id).FirstOrDefaultAsync().ConfigureAwait(false);
         _dbContext.Books.Remove(book);
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task Update(Book domain, CancellationToken cancellationToken)
+    {
+        Assert.NotNull(domain, nameof(domain));
+
+        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Title, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate, BookAuthors = domain.Authors.Select(x => new BookAuthor { AuthorId = x.Id }).ToList() };
+        
+        var ba = await _dbContext.BookAuthor.AsNoTracking().Where(x => x.BookId ==  domain.Id).ToListAsync();
+        if (ba.Count > 0)
+            _dbContext.BookAuthor.RemoveRange(ba);
+
+        _dbContext.Books.Update(model);
+       await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task Add(Book domain, CancellationToken cancellationToken)
+    {
+        Assert.NotNull(domain, nameof(domain));
+        var model = new Data.Models.Book { Id = domain.Id.Value, Description = domain.Description, Name = domain.Title, ISBN = domain.ISBN, GenerId = domain.GenerId, Price = domain.Price, PublishDate = domain.PublishDate, BookAuthors = domain.Authors.Select(x => new BookAuthor { AuthorId = x.Id}).ToList() };
+
+        await _dbContext.Books.AddAsync(model, cancellationToken).ConfigureAwait(false);      
+       await _dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 }

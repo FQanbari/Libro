@@ -61,5 +61,6 @@ app.UseSwaggerUI(c =>
 });
 
 app.MapControllers();
+app.MapGet("/", () => "Hello World!");
 
 app.Run();

@@ -1,4 +1,5 @@
-﻿using Infrastructure.Data.Models;
+﻿using Azure;
+using Infrastructure.Data.Models;
 using Infrastructure.Data.Models.Base;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
 using System.Security.Principal;
 
 namespace Infrastructure.Data;
@@ -22,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<Identity> Identities { get; set; }
+    public DbSet<BookAuthor> BookAuthor { get; set; }
     //public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -31,6 +34,9 @@ public class ApplicationDbContext : DbContext
 
         builder.RegisterAllEntities<IEntity>(entitiesAssembly);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        //builder.ApplyConfiguration(new BookAuthorEntityTypeConfiguration());
+
     }
 }
 

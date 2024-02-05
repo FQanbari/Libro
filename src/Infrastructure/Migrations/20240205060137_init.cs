@@ -38,7 +38,7 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Reservation",
+                name: "Reservations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -48,7 +48,7 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reservation", x => x.Id);
+                    table.PrimaryKey("PK_Reservations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,7 +69,27 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Book",
+                name: "Authors",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HomeTown = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Authors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Authors_Cities_HomeTown",
+                        column: x => x.HomeTown,
+                        principalTable: "Cities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Books",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -84,45 +104,47 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Book", x => x.Id);
+                    table.PrimaryKey("PK_Books", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Book_Geners_GenerId",
+                        name: "FK_Books_Geners_GenerId",
                         column: x => x.GenerId,
                         principalTable: "Geners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Book_Reservation_ReservationId",
+                        name: "FK_Books_Reservations_ReservationId",
                         column: x => x.ReservationId,
-                        principalTable: "Reservation",
+                        principalTable: "Reservations",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Identity",
+                name: "Identities",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     OtpCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpirationOtp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpirationToken = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TokenStatus = table.Column<short>(type: "smallint", nullable: false),
-                    CreatOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Identity", x => x.Id);
+                    table.PrimaryKey("PK_Identities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Identity_User_Id",
-                        column: x => x.Id,
+                        name: "FK_Identities_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MemberShip",
+                name: "MemberShips",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -132,9 +154,9 @@ namespace Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MemberShip", x => x.Id);
+                    table.PrimaryKey("PK_MemberShips", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MemberShip_User_Id",
+                        name: "FK_MemberShips_User_Id",
                         column: x => x.Id,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -163,35 +185,57 @@ namespace Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Authors",
+                name: "AuthorBook",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HomeTown = table.Column<int>(type: "int", nullable: false),
-                    BookId = table.Column<int>(type: "int", nullable: true)
+                    AuthorsId = table.Column<int>(type: "int", nullable: false),
+                    BooksId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Authors", x => x.Id);
+                    table.PrimaryKey("PK_AuthorBook", x => new { x.AuthorsId, x.BooksId });
                     table.ForeignKey(
-                        name: "FK_Authors_Book_BookId",
+                        name: "FK_AuthorBook_Authors_AuthorsId",
+                        column: x => x.AuthorsId,
+                        principalTable: "Authors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AuthorBook_Books_BooksId",
+                        column: x => x.BooksId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookAuthor",
+                columns: table => new
+                {
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    AuthorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookAuthor", x => new { x.BookId, x.AuthorId });
+                    table.ForeignKey(
+                        name: "FK_BookAuthor_Authors_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "Authors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookAuthor_Books_BookId",
                         column: x => x.BookId,
-                        principalTable: "Book",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Authors_Cities_HomeTown",
-                        column: x => x.HomeTown,
-                        principalTable: "Cities",
+                        principalTable: "Books",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Authors_BookId",
-                table: "Authors",
-                column: "BookId");
+                name: "IX_AuthorBook_BooksId",
+                table: "AuthorBook",
+                column: "BooksId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Authors_HomeTown",
@@ -199,14 +243,24 @@ namespace Infrastructure.Migrations
                 column: "HomeTown");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Book_GenerId",
-                table: "Book",
+                name: "IX_BookAuthor_AuthorId",
+                table: "BookAuthor",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_GenerId",
+                table: "Books",
                 column: "GenerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Book_ReservationId",
-                table: "Book",
+                name: "IX_Books_ReservationId",
+                table: "Books",
                 column: "ReservationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Identities_UserId",
+                table: "Identities",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payment_UserId",
@@ -218,31 +272,37 @@ namespace Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Authors");
+                name: "AuthorBook");
 
             migrationBuilder.DropTable(
-                name: "Identity");
+                name: "BookAuthor");
 
             migrationBuilder.DropTable(
-                name: "MemberShip");
+                name: "Identities");
+
+            migrationBuilder.DropTable(
+                name: "MemberShips");
 
             migrationBuilder.DropTable(
                 name: "Payment");
 
             migrationBuilder.DropTable(
-                name: "Book");
+                name: "Authors");
 
             migrationBuilder.DropTable(
-                name: "Cities");
+                name: "Books");
 
             migrationBuilder.DropTable(
                 name: "User");
 
             migrationBuilder.DropTable(
+                name: "Cities");
+
+            migrationBuilder.DropTable(
                 name: "Geners");
 
             migrationBuilder.DropTable(
-                name: "Reservation");
+                name: "Reservations");
         }
     }
 }

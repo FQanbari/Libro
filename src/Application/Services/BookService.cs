@@ -22,7 +22,10 @@ public class BookService: IBookService
         if (author == null)
             throw new Exception("There is no author");
 
-        await _bookRepository.AddOrUpdate(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author (x.Id, x.Name, x.City.Id)).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
+        if (entity.Id != 0)
+            await _bookRepository.Update(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author (x.Id, x.Name, x.City?.Name, x.City?.Id)).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price,entity.Id), cancellationToken);
+        else
+            await _bookRepository.Add(new Book(entity.Name, entity.Description, author.Select(x => new Domain.Entities.BookAggregate.Author(x.Id, x.Name, x.City?.Name, x.City?.Id)).ToList(), entity.GenerId, entity.PublishDate, entity.ISBN, entity.Price, entity.Id), cancellationToken);
     }
 
     public async Task<BookDto> FindById(CancellationToken cancellationToken, params object[] ids)
@@ -36,7 +39,7 @@ public class BookService: IBookService
     {
         var result = await _bookRepository.GetAll(searchby, searchfor, sortby, cancellationToken);
 
-        return result.Select(x => new BookDto { Price = x.Price, Description = x.Description, Name = x.Title, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id }).ToList() });
+        return result.Select(x => new BookDto { Price = x.Price, Description = x.Description, Name = x.Title, ISBN = x.ISBN, GenerId = x.GenerId, Id = x.Id.Value, PublishDate = x.PublishDate, Authors = x.Authors.Select(a => new AuthorDto { Id = a.Id, Name = a.Name, HomeTown = a.HomeTown }).ToList() });
     }
 
     public async Task Remove(int id, CancellationToken cancellationToken)

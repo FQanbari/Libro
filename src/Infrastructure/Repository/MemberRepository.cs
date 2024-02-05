@@ -66,7 +66,7 @@ public class MemberRepository : IMemberRepository
             .Include(x => x.User)
             .Where(x => x.User.PhoneNumber == phoneNumber)
             .Select(x => new Member(x.User.Name, x.User.Family, x.User.Username, x.User.PhoneNumber, 
-            x.Expiration, (MembershipType)x.Type, _dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().OtpCode, _dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().ExpirationOtp, 5M ,x.Id,new List<int>(),new List<string>()
+            x.Expiration, (MembershipType)x.Type, _dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().OtpCode, _dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().ExpirationOtp, 5M ,x.Id,new List<int>(),null
             //_dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().OtpCode,
             //_dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().Expiration,19M            
             //_dbContext.Payments.Where(x => x.Id == ) x.Payments.Sum(x => x.Amount * x.Count))

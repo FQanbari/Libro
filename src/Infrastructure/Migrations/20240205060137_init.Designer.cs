@@ -12,18 +12,33 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231006141459_Add-Book")]
-    partial class AddBook
+    [Migration("20240205060137_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AuthorBook", b =>
+                {
+                    b.Property<int>("AuthorsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BooksId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AuthorsId", "BooksId");
+
+                    b.HasIndex("BooksId");
+
+                    b.ToTable("AuthorBook");
+                });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Author", b =>
                 {
@@ -33,9 +48,6 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BookId")
-                        .HasColumnType("int");
-
                     b.Property<int>("HomeTown")
                         .HasColumnType("int");
 
@@ -44,8 +56,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookId");
 
                     b.HasIndex("HomeTown");
 
@@ -92,6 +102,21 @@ namespace Infrastructure.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("Infrastructure.Data.Models.BookAuthor", b =>
+                {
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BookId", "AuthorId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("BookAuthor");
+                });
+
             modelBuilder.Entity("Infrastructure.Data.Models.City", b =>
                 {
                     b.Property<int>("Id")
@@ -129,7 +154,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Infrastructure.Data.Models.Identity", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatOn")
                         .HasColumnType("datetime2");
@@ -150,9 +178,14 @@ namespace Infrastructure.Migrations
                     b.Property<short>("TokenStatus")
                         .HasColumnType("smallint");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Identity");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Identities");
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.MemberShip", b =>
@@ -171,7 +204,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MemberShip");
+                    b.ToTable("MemberShips");
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Payment", b =>
@@ -217,7 +250,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reservation");
+                    b.ToTable("Reservations");
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.User", b =>
@@ -251,12 +284,23 @@ namespace Infrastructure.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("AuthorBook", b =>
+                {
+                    b.HasOne("Infrastructure.Data.Models.Author", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Data.Models.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Infrastructure.Data.Models.Author", b =>
                 {
-                    b.HasOne("Infrastructure.Data.Models.Book", null)
-                        .WithMany("Authors")
-                        .HasForeignKey("BookId");
-
                     b.HasOne("Infrastructure.Data.Models.City", "City")
                         .WithMany()
                         .HasForeignKey("HomeTown")
@@ -281,11 +325,30 @@ namespace Infrastructure.Migrations
                     b.Navigation("Gener");
                 });
 
+            modelBuilder.Entity("Infrastructure.Data.Models.BookAuthor", b =>
+                {
+                    b.HasOne("Infrastructure.Data.Models.Author", "Author")
+                        .WithMany("BookAuthors")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Data.Models.Book", "Book")
+                        .WithMany("BookAuthors")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Book");
+                });
+
             modelBuilder.Entity("Infrastructure.Data.Models.Identity", b =>
                 {
                     b.HasOne("Infrastructure.Data.Models.User", "User")
                         .WithMany("Identities")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -310,9 +373,14 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("Infrastructure.Data.Models.Author", b =>
+                {
+                    b.Navigation("BookAuthors");
+                });
+
             modelBuilder.Entity("Infrastructure.Data.Models.Book", b =>
                 {
-                    b.Navigation("Authors");
+                    b.Navigation("BookAuthors");
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Reservation", b =>
