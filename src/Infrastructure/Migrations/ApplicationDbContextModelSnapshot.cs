@@ -46,7 +46,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("HomeTown");
 
-                    b.ToTable("Authors");
+                    b.ToTable("Authors", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Book", b =>
@@ -86,7 +86,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ReservationId");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.City", b =>
@@ -103,7 +103,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cities");
+                    b.ToTable("Cities", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Gener", b =>
@@ -120,7 +120,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Geners");
+                    b.ToTable("Geners", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Identity", b =>
@@ -149,7 +149,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Identities");
+                    b.ToTable("Identity", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.MemberShip", b =>
@@ -168,7 +168,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MemberShips");
+                    b.ToTable("MemberShips", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Payment", b =>
@@ -195,7 +195,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payment");
+                    b.ToTable("Payment", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Reservation", b =>
@@ -214,7 +214,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.User", b =>
@@ -245,7 +245,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Infrastructure.Data.Models.Author", b =>
