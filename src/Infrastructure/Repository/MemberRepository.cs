@@ -1,4 +1,4 @@
-﻿using Domain.Entities.MemberAggregate;
+using Domain.Entities.MemberAggregate;
 using Infrastructure.Data;
 using Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +71,11 @@ public class MemberRepository : IMemberRepository
             //_dbContext.Identities.Where(i => i.Id == x.Id).OrderByDescending(x => x.CreatOn).FirstOrDefault().Expiration,19M            
             //_dbContext.Payments.Where(x => x.Id == ) x.Payments.Sum(x => x.Amount * x.Count))
             )).FirstOrDefaultAsync();
+    }
+
+    public Task<List<object>> GetTokens(int userId)
+    {
+        throw new NotImplementedException();
     }
 
     public Task Update(Member member)
